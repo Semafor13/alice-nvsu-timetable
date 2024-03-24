@@ -4,28 +4,13 @@ import datetime
 
 base_url = 'http://timetable.nvsu.ru/tm/index.php/timetable/show_timetable/'
 group_number = "8277"
-subgroup = "1"
+subgroup = "0"
 
 
-def get_current_date():
-    day = datetime.datetime.now().day
-    month = datetime.datetime.now().month
-    year = datetime.datetime.now().year
-    return f"{day}_{month}_{year}"
-
-
-def get_tomorrow_date():
-    day = datetime.datetime.now().day + 1
-    month = datetime.datetime.now().month
-    year = datetime.datetime.now().year
-    return f"{day}_{month}_{year}"
-
-
-date = "02_05_2024"
-
-r = requests.get(f"{base_url}group/{group_number}//{subgroup}/?date={date}")
-soup = BeautifulSoup(r.text, "html.parser")
-timetable: BeautifulSoup = soup.find(id="timetable")
+def get_timetable(date):
+    r = requests.get(f"{base_url}group/{group_number}//{subgroup}/?date={date}")
+    soup = BeautifulSoup(r.text, "html.parser")
+    return soup.find(id="timetable")
 
 
 # Очищает текст от символов \t, \r, \n и пробелов
@@ -38,7 +23,7 @@ def clear_text(text: str) -> str:
     return cleared_text
 
 
-def get_day(tt: BeautifulSoup, d: int) -> list[BeautifulSoup] | None:
+def get_day(tt: BeautifulSoup, d: int) -> list[BeautifulSoup]:
     heads: list[BeautifulSoup] = tt.findAll("thead")
 
     dates = []
@@ -103,4 +88,37 @@ def get_all_classes(tt: BeautifulSoup, d: int) -> list | None:
     return classes
 
 
-print(get_all_classes(timetable, int(date.split("_")[0])))
+def get_today_classes():
+    day = datetime.datetime.now().day
+    month = datetime.datetime.now()
+    year = datetime.datetime.now().year
+
+    timetable: BeautifulSoup = get_timetable(f"{day}_{month}_{year}")
+    return get_all_classes(timetable, day)
+
+
+def get_tomorrow_classes():
+    day = datetime.datetime.now().day + 1
+    month = datetime.datetime.now()
+    year = datetime.datetime.now().year
+
+    timetable: BeautifulSoup = get_timetable(f"{day}_{month}_{year}")
+    return get_all_classes(timetable, day)
+
+
+def get_yesterday_classes():
+    day = datetime.datetime.now().day - 1
+    month = datetime.datetime.now()
+    year = datetime.datetime.now().year
+
+    timetable: BeautifulSoup = get_timetable(f"{day}_{month}_{year}")
+    return get_all_classes(timetable, day)
+
+
+def get_my_date_classes(
+        day=str(datetime.datetime.now().day),
+        month=str(datetime.datetime.now()),
+        year=str(datetime.datetime.now().year)
+        ):
+    timetable: BeautifulSoup = get_timetable(f"{day}_{month}_{year}")
+    return get_all_classes(timetable, datetime.datetime.now().day)
