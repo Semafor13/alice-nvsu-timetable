@@ -38,7 +38,7 @@ def clear_text(text: str) -> str:
     return cleared_text
 
 
-def get_day(tt: BeautifulSoup, d: int) -> BeautifulSoup:
+def get_day(tt: BeautifulSoup, d: int) -> list[BeautifulSoup]:
     heads: list[BeautifulSoup] = tt.findAll("thead")
 
     dates = [int(clear_text(h.find("div").get_text()).split(" ")[1]) for h in heads]
@@ -46,7 +46,7 @@ def get_day(tt: BeautifulSoup, d: int) -> BeautifulSoup:
     if d in dates:
         index_of_day_tr = dates.index(d)
 
-        return tt.findAll("tbody")[index_of_day_tr].find_all("tr")[0]
+        return tt.findAll("tbody")[index_of_day_tr].find_all("tr")
 
 
 # Получает все данные из одной строчки расписания (с одной пары)
@@ -74,4 +74,13 @@ def get_data_from_tr(tr: BeautifulSoup):
     return number_of_exercise, subject_type, subject_name, teacher, groups, auditory
 
 
-print(get_data_from_tr(get_day(timetable, int(date.split("_")[0]))))
+def get_all_classes(tt: BeautifulSoup, d: int) -> list:
+    classes = []
+
+    for tr in get_day(tt, d):
+        classes.append(get_data_from_tr(tr))
+
+    return classes
+
+
+print(get_all_classes(timetable, int(date.split("_")[0])))
