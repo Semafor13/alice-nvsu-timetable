@@ -72,7 +72,8 @@ def get_data_from_tr(tr: BeautifulSoup):
         if tds[2].get_text():
             class_subgroup = clear_text(tds[2].get_text())
 
-    number_of_exercise = tds[1].find("small").get_text()
+    time_of_class = tds[1].find("div").get_text()
+    number_of_class = tds[1].find("small").get_text()
 
     subject_data = clear_text(tds[2 + indexer].get_text()).split("-")
 
@@ -85,7 +86,7 @@ def get_data_from_tr(tr: BeautifulSoup):
 
     auditory = clear_text(tds[5 + indexer].find("a").get_text())
 
-    return number_of_exercise, class_subgroup, subject_type, subject_name, teacher, groups, auditory
+    return time_of_class, number_of_class, class_subgroup, subject_type, subject_name, teacher, groups, auditory
 
 
 def get_all_classes(tt: BeautifulSoup, d: int) -> list | None:
