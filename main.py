@@ -33,7 +33,7 @@ def get_day(tt: BeautifulSoup, d: int) -> list[BeautifulSoup]:
         if h.find(class_="empty-day"):
             continue
 
-        day_in_week = int(clear_text(h.find("div").get_text()).split(" ")[1])
+        day_in_week = int(clear_text(h.find_all("div")[-1].get_text()).split(" ")[1])
 
         dates.append(day_in_week)
 
@@ -112,13 +112,34 @@ def get_yesterday_classes():
     year = datetime.datetime.now().year
 
     timetable: BeautifulSoup = get_timetable(f"{day}_{month}_{year}")
-    return get_all_classes(timetable, day)
+
+    data = get_all_classes(timetable, day)
+
+    print(data)
 
 
 def get_my_date_classes(
         day=str(datetime.datetime.now().day),
-        month=str(datetime.datetime.now()),
+        month=str(datetime.datetime.now().month),
         year=str(datetime.datetime.now().year)
-        ):
+):
     timetable: BeautifulSoup = get_timetable(f"{day}_{month}_{year}")
     return get_all_classes(timetable, datetime.datetime.now().day)
+
+
+def beautify(info):
+    if info is None:
+        return "На этот день у вас нет пар"
+
+    all_strs = []
+    for i in info:
+        all_strs.append(f"С {i[0].split(" ")[0]} по {i[0].split(" ")[1]} пара {i[4]} У {i[5]}")
+
+    full_string = "\n".join(all_strs)
+
+    return full_string
+
+
+a = beautify(get_today_classes())
+
+print(a)
